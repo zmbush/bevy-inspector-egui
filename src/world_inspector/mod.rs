@@ -1,5 +1,5 @@
 pub(crate) mod impls;
-mod inspectable_registry;
+pub(crate) mod inspectable_registry;
 mod plugin;
 
 use bevy::{render::camera::Camera, window::WindowId};

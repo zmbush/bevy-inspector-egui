@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::{widgets::ResourceInspector, Inspectable, InspectorPlugin};
-use bevy_inspector_egui::{InspectableRegistry, WorldInspectorParams, WorldInspectorPlugin};
+use bevy_inspector_egui::{WorldInspectorParams, WorldInspectorPlugin};
 
 #[derive(Inspectable, Default)]
 struct Resources {
@@ -15,9 +15,8 @@ pub struct MyComponent {
 }
 
 fn main() {
-    let mut app = App::build();
-
-    app.insert_resource(Msaa { samples: 4 })
+    App::build()
+        .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins)
         .insert_resource(WorldInspectorParams {
             despawnable_entities: true,
@@ -25,17 +24,8 @@ fn main() {
         })
         .add_plugin(WorldInspectorPlugin::new())
         .add_plugin(InspectorPlugin::<Resources>::new())
-        .add_startup_system(setup.system());
-
-    // getting registry from world
-    let mut registry = app
-        .world_mut()
-        .get_resource_or_insert_with(InspectableRegistry::default);
-
-    // registering custom component to be able to edit it in inspector
-    registry.register::<MyComponent>();
-
-    app.run();
+        .add_startup_system(setup.system())
+        .run();
 }
 
 /// set up a simple 3D scene
@@ -60,7 +50,6 @@ fn setup(
             material: materials.add(Color::rgb_u8(80, 233, 54).into()),
             ..Default::default()
         })
-        .insert(MyComponent::default())
         .insert(Name::new("Floor"));
     commands
         .spawn_bundle(PbrBundle {
@@ -69,6 +58,7 @@ fn setup(
             material: materials.add(Color::rgb(1.0, 1.0, 1.0).into()),
             ..Default::default()
         })
+        .insert(MyComponent::default())
         .insert(Name::new("Cube"))
         .with_children(|commands| {
             commands

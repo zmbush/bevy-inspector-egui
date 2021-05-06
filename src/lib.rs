@@ -90,6 +90,12 @@ pub use bevy_egui::egui;
 pub use bevy_inspector_egui_derive::Inspectable;
 pub use plugin::InspectorPlugin;
 
+#[doc(hidden)]
+pub mod __macro {
+    pub use crate::world_inspector::inspectable_registry::static_register_inspectable;
+    pub use ctor::ctor;
+}
+
 /// Attributes for the built-in [`Inspectable`](Inspectable) implementations
 pub mod options {
     pub use crate::impls::*;

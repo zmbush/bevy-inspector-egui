@@ -1,4 +1,4 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::quote;
 
 use crate::utils;
@@ -58,6 +58,8 @@ pub fn expand_struct(derive_input: &syn::DeriveInput, data: &syn::DataStruct) ->
         }
     });
 
+    let ctor_initialization = static_ctor_initialization(name);
+
     quote! {
         #[allow(clippy::all)]
         impl bevy_inspector_egui::Inspectable for #name {
@@ -80,6 +82,23 @@ pub fn expand_struct(derive_input: &syn::DeriveInput, data: &syn::DataStruct) ->
             fn setup(app: &mut bevy::prelude::AppBuilder) {
                 #(#field_setup)*
             }
+        }
+
+        #ctor_initialization
+    }
+}
+
+fn static_ctor_initialization(ident: &syn::Ident) -> TokenStream {
+    let fn_name = syn::Ident::new(
+        format!("register_inspectable_{}", ident).as_str(),
+        Span::call_site(),
+    );
+
+    quote::quote! {
+        #[cfg(not(any(target_arch = "wasm32", target_arch = "wasm64")))]
+        #[bevy_inspector_egui::__macro::ctor]
+        fn #fn_name() {
+             bevy_inspector_egui::__macro::static_register_inspectable::<#ident>();
         }
     }
 }

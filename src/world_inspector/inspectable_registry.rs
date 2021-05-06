@@ -5,14 +5,22 @@ use bevy::{render::pipeline::PrimitiveTopology, utils::HashMap};
 use bevy_egui::egui;
 use std::any::TypeId;
 
+use once_cell::sync::Lazy;
+use std::sync::Mutex;
+
+static __DERIVED_INSPECTABLE_TYPES: Lazy<Mutex<Vec<fn(&mut InspectableRegistry)>>> =
+    Lazy::new(|| Mutex::new(Vec::new()));
+
+///
+pub fn static_register_inspectable<T: Inspectable + 'static>() {
+    __DERIVED_INSPECTABLE_TYPES
+        .lock()
+        .unwrap()
+        .push(|registry| registry.register::<T>());
+}
+
 pub(crate) type InspectCallback =
     Box<dyn Fn(*mut u8, &mut egui::Ui, &Context) -> bool + Send + Sync>;
-
-macro_rules! register {
-    ($this:ident $($ty:ty),* $(,)?) => {
-        $($this.register::<$ty>();)*
-    };
-}
 
 /// The `InspectableRegistry` can be used to tell the [`WorldInspectorPlugin`](crate::WorldInspectorPlugin)
 /// how to display a type.
@@ -72,6 +80,11 @@ impl InspectableRegistry {
     }
 }
 
+macro_rules! register {
+    ($this:ident $($ty:ty),* $(,)?) => {
+        $($this.register::<$ty>();)*
+    };
+}
 impl Default for InspectableRegistry {
     fn default() -> Self {
         let mut this = InspectableRegistry {
@@ -116,6 +129,10 @@ impl Default for InspectableRegistry {
 
         #[cfg(feature = "rapier")]
         register!(this bevy_rapier3d::rapier::dynamics::MassProperties, bevy_rapier3d::rapier::dynamics::RigidBody, bevy_rapier3d::physics::RigidBodyHandleComponent);
+
+        for setup in __DERIVED_INSPECTABLE_TYPES.lock().unwrap().iter() {
+            setup(&mut this);
+        }
 
         this
     }
