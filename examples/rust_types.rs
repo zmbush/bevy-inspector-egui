@@ -65,7 +65,12 @@ struct NonInspectable;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(bevy::PipelinedDefaultPlugins)
         .add_plugin(InspectorPlugin::<Data>::new())
+        .add_system(setup.system())
         .run();
+}
+
+fn setup(mut commands: Commands) {
+    commands.spawn_bundle(bevy::render2::camera::PerspectiveCameraBundle::default());
 }

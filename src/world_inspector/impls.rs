@@ -94,7 +94,7 @@ impl<Q, F> Default for InspectorQuery<Q, F> {
     }
 }
 
-impl<'w, Q, F> Inspectable for InspectorQuery<Q, F>
+impl<Q: 'static, F: 'static> Inspectable for InspectorQuery<Q, F>
 where
     Q: WorldQuery,
     F: WorldQuery,
@@ -129,7 +129,7 @@ where
                 CollapsingHeader::new(name)
                     .id_source(context.id().with(i))
                     .show(ui, |ui| {
-                        // changed |= value.ui(ui, options.clone(), &context.with_id(i as u64)); TODO figure out how to use options
+                        // TODO figure out how to use options
                         changed |= value.ui(ui, Default::default(), &context.with_id(i as u64));
                     });
             }
@@ -171,10 +171,10 @@ impl<Q, F> Default for InspectorQuerySingle<Q, F> {
     }
 }
 
-impl<'w, Q, F> Inspectable for InspectorQuerySingle<Q, F>
+impl<Q, F> Inspectable for InspectorQuerySingle<Q, F>
 where
-    Q: WorldQuery,
-    F: WorldQuery,
+    Q: WorldQuery + 'static,
+    F: WorldQuery + 'static,
     F::Fetch: FilterFetch,
     for<'a, 's> <<Q as WorldQuery>::Fetch as Fetch<'a, 's>>::Item: Inspectable,
 {
@@ -199,6 +199,10 @@ where
         let mut changed = false;
 
         ui.vertical(move |ui| {
+            fn is_static<T: 'static>(_: &T) {}
+            let options = options.clone();
+
+            is_static(&options);
             let mut query_state = world.query_filtered::<Q, F>();
             let mut iter = query_state.iter_mut(world);
             let value = iter.next();

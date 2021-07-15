@@ -40,7 +40,7 @@ impl Default for Data {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(PipelinedDefaultPlugins)
         .add_plugin(InspectorPlugin::<Data>::new())
         .add_startup_system(setup.system())
         .add_system(text_update_system.system())
