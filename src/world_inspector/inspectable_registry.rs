@@ -139,6 +139,13 @@ impl Default for InspectableRegistry {
             );
         }
 
+        // render2
+        {
+            use bevy::pbr2::*;
+            use bevy::render2::*;
+            register!(this color::Color, StandardMaterial, Handle<texture::Image>, Handle<StandardMaterial>, PointLight);
+        }
+
         this
     }
 }

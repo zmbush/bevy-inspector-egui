@@ -1,5 +1,9 @@
 use bevy::prelude::*;
+use bevy::PipelinedDefaultPlugins;
 use bevy_inspector_egui::{Inspectable, InspectorPlugin};
+
+use bevy::pbr2::{PbrBundle, StandardMaterial};
+use bevy::render2::{color::Color, mesh::shape, mesh::Mesh};
 
 #[derive(Inspectable, Debug)]
 struct Data {
@@ -27,7 +31,7 @@ impl FromWorld for Data {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(PipelinedDefaultPlugins)
         .add_plugin(InspectorPlugin::<Data>::new())
         .add_startup_system(setup.system())
         .run();
@@ -52,6 +56,10 @@ fn setup(
     });
     commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        point_light: PointLight {
+            intensity: 1000.0,
+            ..Default::default()
+        },
         ..Default::default()
     });
     commands.spawn_bundle(PerspectiveCameraBundle {
