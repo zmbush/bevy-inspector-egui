@@ -44,7 +44,7 @@ Add the `InspectorPlugin` to your App.
 use bevy_inspector_egui::InspectorPlugin;
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(InspectorPlugin::<Data>::new())
         .add_system(your_system.system())
@@ -62,7 +62,7 @@ use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system(setup.system())
